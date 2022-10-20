@@ -1,9 +1,9 @@
-// (Lines like the one below ignore selected Clippy rules
-//  - it's useful when you want to check your code with `cargo make verify`
-// but some rules are too "annoying" or are not applicable for your case.)
-#![allow(clippy::wildcard_imports)]
+// TODO: Remove
+// #![allow(clippy::wildcard_imports)]
 
 use seed::{prelude::*, *};
+use std::collections::BTreeMap;
+use ulid::Ulid;
 
 // ------ ------
 //     Init
@@ -11,8 +11,15 @@ use seed::{prelude::*, *};
 
 // `init` describes what should happen when your app started.
 fn init(_: Url, _: &mut impl Orders<Msg>) -> Model {
-    Model { counter: 0 }
+    Model {
+        todos: BTreeMap::new(),
+        new_todo_title: String::new(),
+        selected_todo: None,
+        filter: Filter::All,
+        base_url: Url::new(),
+    }.add_mock_data()
 }
+
 
 // ------ ------
 //     Model
@@ -26,14 +33,43 @@ struct Model {
     base_url: Url,
 }
 
+// TODO: Remove
+impl Model {
+    fn add_mock_data(mut self) -> Self {
+        let (id_a, id_b) = (Ulid::new(), Ulid::new());
+
+        self.todos.insert(id_a, Todo {
+            id: id_a,
+            title: "I'm todo A".to_owned(),
+            completed: false,
+        });
+
+        self.todos.insert(id_b, Todo {
+            id: id_b,
+            title: "I'm todo B".to_owned(),
+            completed: true,
+        });
+
+
+        self.new_todo_title = "I'm a new todo title.".to_owned();
+
+        self.selected_todo = Some(SelectedTodo {
+            id: id_b,
+            title: "I'm better todo B".to_owned(),
+            input_element: ElRef::new(),
+        });
+        self
+    }
+}
+
 struct Todo {
-    id: ID,
+    id: Ulid,
     title: String,
     completed: bool,
 }
 
 struct SelectedTodo {
-    id: ID,
+    id: Ulid,
     title: String,
     input_element: ElRef<web_sys::HtmlInputElement>,
 }
@@ -48,9 +84,6 @@ enum Filter {
 //    Update
 // ------ ------
 
-// (Remove the line below once any of your `Msg` variants doesn't implement `Copy`.)
-#[derive(Copy, Clone)]
-// `Msg` describes the different events you can modify state with.
 enum Msg {
     UrlChanged(subs::UrlChanged),
     NewTodoTitleChanged(String),
@@ -76,7 +109,45 @@ enum Msg {
 // `update` describes how to handle each `Msg`.
 fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
     match msg {
-        Msg::Increment => model.counter += 1,
+        Msg::UrlChanged(subs::UrlChanged(url)) => {
+            log!("UrlChanged", url);
+        }
+        Msg::NewTodoTitleChanged(title) => {
+            log!("NewTodoTitleChanged", title);
+        }
+
+        // ------ Basic Todo operations ------
+
+        Msg::CreateTodo => {
+            log!("CreateTodo");
+        }
+        Msg::ToggleTodo(id) => {
+            log!("ToggleTodo");
+        }
+        Msg::RemoveTodo(id) => {
+            log!("RemoveTodo");
+        }
+
+        // ------ Bulk operations ------
+
+        Msg::CheckOrUncheckAll => {
+            log!("CheckOrUncheckAll");
+        }
+        Msg::ClearCompleted => {
+            log!("ClearCompleted");
+        }
+
+        // ------ Selection ------
+
+        Msg::SelectTodo(opt_id) => {
+            log!("SelectTodo");
+        }
+        Msg::SelectedTodoTitleChanged(title) => {
+            log!("SelectedTodoTitleChanged", title);
+        }
+        Msg::SaveSelectedTodo => {
+            log!("SaveSelectedTodo");
+        }
     }
 }
 
@@ -84,12 +155,9 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
 //     View
 // ------ ------
 
-// `view` describes what to display.
 fn view(model: &Model) -> Node<Msg> {
     div![
-        "This is a counter: ",
-        C!["counter"],
-        button![model.counter, ev(Ev::Click, |_| Msg::Increment),],
+        "I'm a placeholder"
     ]
 }
 
