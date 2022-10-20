@@ -18,9 +18,30 @@ fn init(_: Url, _: &mut impl Orders<Msg>) -> Model {
 //     Model
 // ------ ------
 
-// `Model` describes our app state.
 struct Model {
-    counter: i32,
+    todos: BTreeMap<Ulid, Todo>,
+    new_todo_title: String,
+    selected_todo: Option<SelectedTodo>,
+    filter: Filter,
+    base_url: Url,
+}
+
+struct Todo {
+    id: ID,
+    title: String,
+    completed: bool,
+}
+
+struct SelectedTodo {
+    id: ID,
+    title: String,
+    input_element: ElRef<web_sys::HtmlInputElement>,
+}
+
+enum Filter {
+    All,
+    Active,
+    Completed,
 }
 
 // ------ ------
