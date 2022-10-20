@@ -52,7 +52,25 @@ enum Filter {
 #[derive(Copy, Clone)]
 // `Msg` describes the different events you can modify state with.
 enum Msg {
-    Increment,
+    UrlChanged(subs::UrlChanged),
+    NewTodoTitleChanged(String),
+
+    // ------ Basic Todo operations ------
+
+    CreateTodo,
+    ToggleTodo(Ulid),
+    RemoveTodo(Ulid),
+
+    // ------ Bulk operations ------
+
+    CheckOrUncheckAll,
+    ClearCompleted,
+
+    // ------ Selection ------
+
+    SelectTodo(Option<Ulid>),
+    SelectedTodoTitleChanged(String),
+    SaveSelectedTodo,
 }
 
 // `update` describes how to handle each `Msg`.
