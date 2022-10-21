@@ -155,10 +155,8 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
 //     View
 // ------ ------
 
-fn view(model: &Model) -> Node<Msg> {
-    div![
-        "I'm a placeholder"
-    ]
+fn view(model: &Model) -> Vec<Node<Msg>> {
+    raw![include_str!("../template.html")]
 }
 
 // ------ ------
