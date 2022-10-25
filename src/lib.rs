@@ -156,7 +156,112 @@ fn update(msg: Msg, model: &mut Model, _: &mut impl Orders<Msg>) {
 // ------ ------
 
 fn view(model: &Model) -> Vec<Node<Msg>> {
-    raw![include_str!("../template.html")]
+    nodes![
+        view_header(&model.new_todo_title),
+        IF!(not(model.todos.is_empty()) => vec![
+            view_main(&model.todos, model.selected_todo.as_ref()),
+            view_footer(),
+        ]),
+    ]
+}
+
+// ------ header ------
+fn view_header(new_todo_title: &str) -> Node<Msg> {
+    header![
+        C!["header"],
+        h1!["todos"],
+        input![
+            C!["new-todo"],
+            attrs![
+                At::Placeholder => "What needs to be done?",
+                At::AutoFocus => AtValue::None,
+                At::Value => new_todo_title,
+            ],
+        ]
+    ]
+}
+
+// ------ main ------
+fn view_main(todos: &BTreeMap<Ulid, Todo>, selected_todo: Option<&SelectedTodo>) -> Node<Msg> {
+    section![
+        C!["main"],
+        view_toggle_all(),
+        view_todo_list(todos, selected_todo),
+    ]
+}
+
+fn view_toggle_all() -> Vec<Node<Msg>> {
+    vec![
+        input![
+            C!["toggle-all"],
+            attrs![At::Id => "toggle-all", At::Type => "checkbox"],
+        ],
+        label![
+            attrs![At::For => "toggle-all"],
+            "Make all as complete",
+        ],
+    ]
+}
+
+fn view_todo_list(todos: &BTreeMap<Ulid, Todo>, selected_todo: Option<&SelectedTodo>) -> Node<Msg> {
+    ul![
+        C!["todo-list"],
+        todos.values().map(|todo| {
+            let is_selected = Some(todo.id) == selected_todo.map(|selected_todo| selected_todo.id);
+
+            li![
+                C![IF!(todo.completed => "completed"), IF!(is_selected => "editing")],
+                div![
+                    C!["view"],
+                    input![
+                        C!["toggle"],
+                        attrs!{At::Type => "checkbox", At::Checked => todo.completed.as_at_value()},
+                    ],
+                    label![&todo.title],
+                    button![C!["destroy"]],
+                ],
+                IF!(is_selected => input![C!["edit"], attrs!{At::Value => selected_todo.unwrap().title}]),
+            ]
+        })
+    ]
+}
+
+// ------ footer ------
+fn view_footer() -> Node<Msg> {
+    footer![
+        C!["footer"],
+        span![
+            C!["todo-count"],
+            strong!["0"],
+            "item left",
+        ],
+        ul![
+            C!["filters"],
+            li![
+                a![
+                    C!["selected"],
+                    attrs![At::Href => "#/"],
+                    "All",
+                ],
+            ],
+            li![
+                a![
+                    attrs![At::Href => "#/active"],
+                    "Active",
+                ],
+            ],
+            li![
+                a![
+                    attrs![At::Href => "#/completed"],
+                    "Completed",
+                ],
+            ],
+        ],
+        button![
+            C!["clear-completed"],
+            "Clear completed"
+        ],
+    ]
 }
 
 // ------ ------
