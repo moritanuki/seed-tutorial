@@ -2,7 +2,7 @@
 version = "0.1.0"
 name = "seed-tutorial"
 repository = "https://github.com/seed-rs/seed-quickstart"
-authors = ["moritanuki <ilovfam12@gmail.com>"]
+authors = ["moritanuki"]
 description = "App Description"
 categories = ["category"]
 license = "MIT"
